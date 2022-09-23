@@ -6,6 +6,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <iostream>
 
 #include "common.hh"
 
@@ -14,9 +15,11 @@ main(void) {
   coap_context_t  *ctx = nullptr;
   coap_address_t dst;
   coap_resource_t *resource = nullptr;
+  coap_resource_t *resource1 = nullptr;
   coap_endpoint_t *endpoint = nullptr;
   int result = EXIT_FAILURE;;
-  coap_str_const_t *ruri = coap_make_str_const("hello");
+  coap_str_const_t *ruri = coap_make_str_const("mayank");
+  coap_str_const_t *ruri1 = coap_make_str_const("bye");
   coap_startup();
 
   /* resolve destination address where server should be sent */
@@ -42,10 +45,24 @@ main(void) {
                           coap_show_pdu(LOG_WARNING, request);
                           coap_pdu_set_code(response, COAP_RESPONSE_CODE_CONTENT);
                           coap_add_data(response, 5,
-                                        (const uint8_t *)"world");
+                                        (const uint8_t *)"wowow");
                           coap_show_pdu(LOG_WARNING, response);
                         });
   coap_add_resource(ctx, resource);
+  
+  resource1 = coap_resource_init(ruri1, 0);
+  coap_register_handler(resource1, COAP_REQUEST_PUT,
+                        [](auto, auto,
+                           const coap_pdu_t *request,
+                           auto,
+                           coap_pdu_t *response) {
+                          coap_show_pdu(LOG_WARNING, request);
+                          coap_pdu_set_code(response, COAP_RESPONSE_CODE_CONTENT);
+                          // coap_add_data(response, 4,
+                          //               (const uint8_t *)"tata");
+                          // coap_show_pdu(LOG_WARNING, response);
+                        });
+  coap_add_resource(ctx, resource1);
 
   while (true) { coap_io_process(ctx, COAP_IO_WAIT); }
 

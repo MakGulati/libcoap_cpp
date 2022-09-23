@@ -6,9 +6,10 @@
 LIBCOAP?=libcoap-3
 
 pkgconfig=$(shell pkg-config $(1) $(2))
-CPPFLAGS=-Wall -Wextra $(call pkgconfig,--cflags,$(LIBCOAP))
+CPPFLAGS=-Wall -Wextra $(call pkgconfig,--cflags,$(LIBCOAP)) -shared libnanocbor.so
 LDLIBS=$(call pkgconfig,--libs,$(LIBCOAP))
-LINK.o=$(LINK.cc)
+LINK.o=$(LINK.cc) 
+# LINK.o=-shared: build/libnanocbor.so
 
 CXXFLAGS=-std=c++14
 

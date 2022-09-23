@@ -6,9 +6,8 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
-#include <iostream>
+
 #include "common.hh"
-#include "nanocbor/nanocbor.h"
 
 static int have_response = 0;
 
@@ -21,19 +20,6 @@ int main(void)
   coap_pdu_t *pdu1 = nullptr;
   int result = EXIT_FAILURE;
   ;
-  uint8_t payload_buffer[128];
-  nanocbor_encoder_t enc;
-  float m0_local = 3.512735;
-  float m1_local = 9.285732;
-  float m2_local = 4.994352;
-  float b_local = 1.366232;
-  nanocbor_encoder_init(&enc, payload_buffer, sizeof(payload_buffer));
-  nanocbor_fmt_array(&enc, 4);
-  nanocbor_fmt_float(&enc, m0_local);
-  nanocbor_fmt_float(&enc, m1_local);
-  nanocbor_fmt_float(&enc, m2_local);
-  nanocbor_fmt_float(&enc, b_local);
-  size_t payload_len = nanocbor_encoded_len(&enc);
 
   coap_startup();
 
@@ -76,13 +62,11 @@ int main(void)
   pdu = coap_pdu_init(COAP_MESSAGE_CON,
                       COAP_REQUEST_CODE_GET,
                       coap_new_message_id(session),
-                      coap_session_max_pdu_size(session));
+                      4);
   pdu1 = coap_pdu_init(COAP_MESSAGE_CON,
                        COAP_REQUEST_CODE_PUT,
                        coap_new_message_id(session),
-                       coap_session_max_pdu_size(session));
-  // std::cout << coap_session_max_pdu_size(session) << std::endl;
-
+                       4);
   if (!pdu)
   {
     coap_log(LOG_EMERG, "cannot create PDU\n");
@@ -101,7 +85,7 @@ int main(void)
   // coap_show_pdu(LOG_WARNING, pdu);
 
   // PUT REQUEST
-  coap_add_data(pdu1, payload_len, payload_buffer);
+  coap_add_data(pdu1, 4, (uint8_t *)"12,34");
 
   coap_show_pdu(LOG_WARNING, pdu1);
   /* and send the PDU */
